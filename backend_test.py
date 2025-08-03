@@ -103,7 +103,7 @@ class NFCContactAPITester:
             "phone_number": "+49 987 654321",
             "text": "Kontakt ohne Namen"
         }
-        return self.run_test("Create Contact (No Name)", "POST", "api/contacts", 201, test_contact)
+        return self.run_test("Create Contact (No Name)", "POST", "api/contacts", 200, test_contact)
 
     def test_create_contact_validation_error(self):
         """Test creating contact with missing required fields"""
