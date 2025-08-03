@@ -114,14 +114,14 @@ class NFCContactAPITester:
         return self.run_test("Create Contact (Validation Error)", "POST", "api/contacts", 422, test_contact)
 
     def test_create_contact_too_large(self):
-        """Test creating contact that exceeds NFC 215 size limit"""
-        large_text = "A" * 500  # Create large text to exceed 504 byte limit
+        """Test creating contact that exceeds text length limit"""
+        large_text = "A" * 101  # Exceed the 100 character limit in Pydantic model
         test_contact = {
             "name": "Large Contact",
             "phone_number": "+49 123 456789",
             "text": large_text
         }
-        return self.run_test("Create Contact (Too Large)", "POST", "api/contacts", 400, test_contact)
+        return self.run_test("Create Contact (Too Large)", "POST", "api/contacts", 422, test_contact)
 
     def test_get_contacts_with_data(self):
         """Test getting contacts after creating some"""
