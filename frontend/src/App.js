@@ -347,6 +347,15 @@ function App() {
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => downloadQrCode(contact)}
+                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+                    >
+                      <QrCode className="w-4 h-4 mr-1" />
+                      QR
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleDelete(contact.id)}
                       className="text-red-600 hover:text-red-800"
                     >
