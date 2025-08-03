@@ -470,7 +470,16 @@ function App() {
                       className="flex-1"
                     >
                       <Download className="w-4 h-4 mr-1" />
-                      Download
+                      vCard
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => downloadQrCode(selectedContact)}
+                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+                    >
+                      <QrCode className="w-4 h-4 mr-1" />
+                      QR-Code
                     </Button>
                   </div>
                 </div>
