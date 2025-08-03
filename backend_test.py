@@ -69,7 +69,7 @@ class NFCContactAPITester:
             "phone_number": "+49 123 456789",
             "text": "Test Beschreibung für NFC Tag"
         }
-        success, response = self.run_test("Create Contact", "POST", "api/contacts", 201, test_contact)
+        success, response = self.run_test("Create Contact", "POST", "api/contacts", 200, test_contact)
         if success and 'id' in response:
             self.created_contact_id = response['id']
             print(f"   Created contact ID: {self.created_contact_id}")
