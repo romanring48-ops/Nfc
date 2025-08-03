@@ -7,7 +7,7 @@ import { Textarea } from './components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './components/ui/dialog';
 import { Badge } from './components/ui/badge';
 import { Separator } from './components/ui/separator';
-import { Phone, Plus, Edit, Trash2, Smartphone, Copy, Download, AlertCircle, CheckCircle } from 'lucide-react';
+import { Phone, Plus, Edit, Trash2, Smartphone, Copy, Download, AlertCircle, CheckCircle, QrCode } from 'lucide-react';
 import { Alert, AlertDescription } from './components/ui/alert';
 import './App.css';
 
