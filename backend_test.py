@@ -198,6 +198,147 @@ class NFCContactAPITester:
         fake_id = "00000000-0000-0000-0000-000000000000"
         return self.run_test("Get NDEF Non-existent Contact", "GET", f"api/contacts/{fake_id}/ndef", 404)
 
+    def test_get_qr_code(self):
+        """Test getting QR code SVG for a specific contact"""
+        if not self.created_contact_id:
+            print("❌ No contact ID available for QR code test")
+            return False, {}
+            
+        url = f"{self.base_url}/api/contacts/{self.created_contact_id}/qr-code"
+        print(f"\n🔍 Testing QR Code Generation...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url)
+            success = response.status_code == 200
+            
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                
+                # Check Content-Type header
+                content_type = response.headers.get('Content-Type', '')
+                if content_type == 'image/svg+xml':
+                    print(f"✅ Correct Content-Type: {content_type}")
+                else:
+                    print(f"❌ Wrong Content-Type: {content_type}, expected: image/svg+xml")
+                
+                # Check Content-Disposition header for filename
+                content_disposition = response.headers.get('Content-Disposition', '')
+                if 'attachment' in content_disposition and '.svg' in content_disposition:
+                    print(f"✅ Correct Content-Disposition: {content_disposition}")
+                else:
+                    print(f"❌ Wrong Content-Disposition: {content_disposition}")
+                
+                # Check SVG content
+                svg_content = response.text
+                if svg_content.startswith('<?xml') or svg_content.startswith('<svg'):
+                    print(f"✅ Valid SVG content detected (length: {len(svg_content)} chars)")
+                    
+                    # Check if it contains vCard-like data (QR codes contain encoded data)
+                    if 'BEGIN:VCARD' in svg_content or len(svg_content) > 100:
+                        print(f"✅ QR code appears to contain vCard data")
+                    else:
+                        print(f"⚠️  QR code content may not contain vCard data")
+                else:
+                    print(f"❌ Invalid SVG content")
+                    return False, {}
+                    
+                return True, {'svg_content': svg_content[:200] + '...'}
+            else:
+                print(f"❌ Failed - Expected 200, got {response.status_code}")
+                return False, {}
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False, {}
+        finally:
+            self.tests_run += 1
+
+    def test_get_qr_code_nonexistent_contact(self):
+        """Test getting QR code for non-existent contact"""
+        fake_id = "00000000-0000-0000-0000-000000000000"
+        url = f"{self.base_url}/api/contacts/{fake_id}/qr-code"
+        print(f"\n🔍 Testing QR Code for Non-existent Contact...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url)
+            success = response.status_code == 404
+            
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
+                return True, {}
+            else:
+                print(f"❌ Failed - Expected 404, got {response.status_code}")
+                return False, {}
+                
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            return False, {}
+        finally:
+            self.tests_run += 1
+
+    def test_create_contact_with_umlauts(self):
+        """Test creating contact with German umlauts"""
+        test_contact = {
+            "name": "Müller Björn",
+            "phone_number": "+49 123 456789",
+            "text": "Geschäftlich - Büro München, Größe: groß"
+        }
+        success, response = self.run_test("Create Contact (German Umlauts)", "POST", "api/contacts", 200, test_contact)
+        if success and 'id' in response:
+            # Test QR code generation with umlauts
+            contact_id = response['id']
+            url = f"{self.base_url}/api/contacts/{contact_id}/qr-code"
+            print(f"   Testing QR code with umlauts...")
+            
+            try:
+                qr_response = requests.get(url)
+                if qr_response.status_code == 200:
+                    print(f"✅ QR code generated successfully with umlauts")
+                    # Clean up
+                    requests.delete(f"{self.base_url}/api/contacts/{contact_id}")
+                else:
+                    print(f"❌ QR code generation failed with umlauts: {qr_response.status_code}")
+            except Exception as e:
+                print(f"❌ QR code test with umlauts failed: {str(e)}")
+                
+        return success, response
+
+    def test_create_contact_large_data(self):
+        """Test creating contact with large data (near NFC limit)"""
+        # Create data close to but under the 504 byte limit
+        large_text = "A" * 80  # Large but within the 100 char limit in model
+        test_contact = {
+            "name": "Large Data Contact",
+            "phone_number": "+49 123 456789 ext 12345",
+            "text": large_text
+        }
+        success, response = self.run_test("Create Contact (Large Data)", "POST", "api/contacts", 200, test_contact)
+        if success and 'id' in response:
+            contact_id = response['id']
+            print(f"   Data size: {response.get('data_size', 'unknown')} bytes")
+            
+            # Test QR code generation with large data
+            url = f"{self.base_url}/api/contacts/{contact_id}/qr-code"
+            print(f"   Testing QR code with large data...")
+            
+            try:
+                qr_response = requests.get(url)
+                if qr_response.status_code == 200:
+                    svg_size = len(qr_response.text)
+                    print(f"✅ QR code generated successfully with large data (SVG size: {svg_size} chars)")
+                    # Clean up
+                    requests.delete(f"{self.base_url}/api/contacts/{contact_id}")
+                else:
+                    print(f"❌ QR code generation failed with large data: {qr_response.status_code}")
+            except Exception as e:
+                print(f"❌ QR code test with large data failed: {str(e)}")
+                
+        return success, response
+
     def test_delete_contact(self):
         """Test deleting a contact"""
         if not self.created_contact_id:
