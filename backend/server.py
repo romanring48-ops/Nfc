@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pymongo import MongoClient
 from pydantic import BaseModel, Field
 from typing import Optional, List
@@ -7,6 +8,9 @@ import os
 import uuid
 import json
 import base64
+import qrcode
+import qrcode.image.svg
+from io import BytesIO
 from datetime import datetime
 
 # Initialize FastAPI
