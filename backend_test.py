@@ -366,11 +366,15 @@ def main():
         tester.test_create_contact_without_name,
         tester.test_create_contact_validation_error,
         tester.test_create_contact_too_large,
+        tester.test_create_contact_with_umlauts,
+        tester.test_create_contact_large_data,
         tester.test_get_contacts_with_data,
         tester.test_update_contact,
         tester.test_update_nonexistent_contact,
         tester.test_get_ndef_data,
         tester.test_get_ndef_nonexistent_contact,
+        tester.test_get_qr_code,
+        tester.test_get_qr_code_nonexistent_contact,
         tester.test_delete_contact,
         tester.test_delete_nonexistent_contact
     ]
