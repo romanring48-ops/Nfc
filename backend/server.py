@@ -204,6 +204,56 @@ async def delete_contact(contact_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting contact: {str(e)}")
 
+@app.get("/api/contacts/{contact_id}/qr-code")
+async def get_contact_qr_code(contact_id: str):
+    """Generate QR code SVG for a specific contact"""
+    try:
+        contact = contacts_collection.find_one({"id": contact_id})
+        if not contact:
+            raise HTTPException(status_code=404, detail="Contact not found")
+        
+        # Generate vCard data
+        vcard_data = f"""BEGIN:VCARD
+VERSION:3.0
+FN:{contact.get('name', '') if contact.get('name') else contact['phone_number']}
+TEL:{contact['phone_number']}
+NOTE:{contact['text']}
+END:VCARD""".strip()
+        
+        # Create QR code with SVG factory
+        qr = qrcode.QRCode(
+            version=1,  # Size of QR code (1 is smallest)
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        
+        qr.add_data(vcard_data)
+        qr.make(fit=True)
+        
+        # Create SVG image
+        factory = qrcode.image.svg.SvgPathImage
+        svg_img = qr.make_image(image_factory=factory)
+        
+        # Convert to string
+        svg_bytes = BytesIO()
+        svg_img.save(svg_bytes)
+        svg_content = svg_bytes.getvalue().decode('utf-8')
+        
+        # Return SVG content with proper headers
+        return Response(
+            content=svg_content,
+            media_type="image/svg+xml",
+            headers={
+                "Content-Disposition": f"attachment; filename=\"{contact.get('name', contact['phone_number'])}_qr.svg\""
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating QR code: {str(e)}")
+
 @app.get("/api/contacts/{contact_id}/ndef")
 async def get_contact_ndef(contact_id: str):
     """Get NDEF data for a specific contact"""
