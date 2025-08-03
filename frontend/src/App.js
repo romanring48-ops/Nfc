@@ -141,18 +141,28 @@ function App() {
     showAlert('In Zwischenablage kopiert', 'success');
   };
 
-  // Download NDEF data
-  const downloadNdefData = (contact) => {
-    const data = atob(contact.ndef_data);
-    const blob = new Blob([data], { type: 'text/vcard' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${contact.name || contact.phone_number}_nfc.vcf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  // Download QR Code
+  const downloadQrCode = async (contact) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/contacts/${contact.id}/qr-code`);
+      if (response.ok) {
+        const svgContent = await response.text();
+        const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${contact.name || contact.phone_number}_qr.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showAlert('QR-Code erfolgreich heruntergeladen', 'success');
+      } else {
+        showAlert('Fehler beim Generieren des QR-Codes', 'error');
+      }
+    } catch (error) {
+      showAlert('Verbindungsfehler beim QR-Code Download', 'error');
+    }
   };
 
   useEffect(() => {
