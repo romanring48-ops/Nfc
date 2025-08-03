@@ -486,12 +486,25 @@ function App() {
 
                 <div className="bg-blue-50 p-4 rounded-lg">
                   <h4 className="font-semibold mb-2 text-blue-800">Anleitung:</h4>
-                  <ol className="text-sm text-blue-700 space-y-1">
-                    <li>1. Installieren Sie eine NFC-App (z.B. "NFC Tools" oder "TagWriter")</li>
-                    <li>2. Wählen Sie "vCard" oder "Kontakt" als Datentyp</li>
-                    <li>3. Fügen Sie die kopierten Daten ein oder nutzen Sie die Download-Datei</li>
-                    <li>4. Halten Sie Ihr Gerät an den NFC 215 Tag zum Schreiben</li>
-                  </ol>
+                  <div className="text-sm text-blue-700 space-y-2">
+                    <div>
+                      <strong>Option 1 - NFC-App:</strong>
+                      <ol className="ml-4 space-y-1">
+                        <li>1. Installieren Sie eine NFC-App (z.B. "NFC Tools" oder "TagWriter")</li>
+                        <li>2. Wählen Sie "vCard" oder "Kontakt" als Datentyp</li>
+                        <li>3. Fügen Sie die kopierten Daten ein oder nutzen Sie die vCard-Datei</li>
+                        <li>4. Halten Sie Ihr Gerät an den NFC 215 Tag zum Schreiben</li>
+                      </ol>
+                    </div>
+                    <div>
+                      <strong>Option 2 - QR-Code:</strong>
+                      <ol className="ml-4 space-y-1">
+                        <li>1. Laden Sie den QR-Code als SVG-Datei herunter</li>
+                        <li>2. Drucken oder zeigen Sie den QR-Code an</li>
+                        <li>3. Andere können den Kontakt einfach per QR-Code scannen</li>
+                      </ol>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex justify-end">
