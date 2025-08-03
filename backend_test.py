@@ -313,7 +313,7 @@ class NFCContactAPITester:
         large_text = "A" * 80  # Large but within the 100 char limit in model
         test_contact = {
             "name": "Large Data Contact",
-            "phone_number": "+49 123 456789 ext 12345",
+            "phone_number": "+49 123 456789",  # Keep within 20 char limit
             "text": large_text
         }
         success, response = self.run_test("Create Contact (Large Data)", "POST", "api/contacts", 200, test_contact)
